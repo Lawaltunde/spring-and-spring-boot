@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: spring-boot-exercises
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+server:
+  port: 8080
+
+app:
+  order:
+    max-items: 10
+
+# TODO: 18 - Add actuator configuration:
+#  management:
+#    endpoints:
+#      web:
+#        exposure:
+#          include: health,info,metrics
+#    info:
+#      env:
+#        enabled: true

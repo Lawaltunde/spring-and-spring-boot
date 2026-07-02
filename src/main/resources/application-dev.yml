@@ -1,0 +1,8 @@
+# TODO: 16 - Create a dev profile configuration:
+#  app:
+#    order:
+#      max-items: 100
+#  server:
+#    port: 8081
+#  To activate: add spring.profiles.active=dev to application.yml
+#  or run with --spring.profiles.active=dev
