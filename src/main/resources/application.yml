@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: spring-boot-exercises
+server:
+  port: 9090
+  servlet:
+    context-path: /amigoscode
+  jetty:
+    connection-idle-timeout: 30s
