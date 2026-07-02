@@ -1,0 +1,5 @@
+app:
+  order:
+    max-items: 100
+server:
+  port: 8081
