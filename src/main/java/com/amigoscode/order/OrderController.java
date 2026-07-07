@@ -1,49 +1,71 @@
 package com.amigoscode.order;
 
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-// TODO: 9 - Add @RequestMapping("/api/v1/orders") at the class level
-//  Then simplify all endpoint paths below (remove "/api/v1/orders" prefix)
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 @RestController
+@RequestMapping("api/v1/orders")
 public class OrderController {
+
+    private OrderService orderService;
+
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
+
 
     // TODO: 13 - Inject OrderService via constructor injection
     //  (replace direct data access with service calls)
 
-    // TODO: 1 - Create a GET endpoint mapped to "/api/v1/orders/welcome"
-    //  that returns the string "Welcome to the Orders API"
+    @GetMapping("/welcome")
+    public ResponseEntity<String> greeting() {
+        return ResponseEntity.status(HttpStatus.OK).body("Welcome to the Orders API");
+    }
 
-    // TODO: 2 - Create a GET endpoint mapped to "/api/v1/orders/sample"
-    //  that returns a single hardcoded Order object
-    //  Hint: new Order(1L, "Laptop", "PENDING", 999.99, "john@mail.com", LocalDate.now(), "rush")
 
-    // TODO: 3 - Create a GET endpoint mapped to "/api/v1/orders"
-    //  that returns a hardcoded List of Order objects
-    //  Hint: use List.of(...)
+    @GetMapping("/samples")
+    public ResponseEntity<List<Order>> orders() {
+        return new ResponseEntity<>(orderService.getAllOrders(), HttpStatus.OK);
+    }
 
-    // TODO: 4 - Create a GET endpoint mapped to "/api/v1/orders/{id}"
-    //  that takes a @PathVariable Long id and returns an Order
-    //  For now, return a hardcoded Order with the given id
+    @GetMapping("/{id}")
+    public ResponseEntity<Optional<Order>> getOrderById(@PathVariable Long id) {
+        return orderService.getOrderById(id)
+                .map(order -> new ResponseEntity<>(Optional.of(order), HttpStatus.OK))
+                .orElse(new ResponseEntity<>(Optional.empty(), HttpStatus.NOT_FOUND));
+    }
 
-    // TODO: 5 - Create a GET endpoint mapped to "/api/v1/orders/filter"
-    //  that takes a @RequestParam(required = false) String status
-    //  Return a filtered list if status is provided, otherwise return all
+    @GetMapping()
+    public ResponseEntity<List<Order>> getFilteredOrders(@RequestParam(required = false) String status) {
+        if (status == null || status.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        return new ResponseEntity<>(orderService.getOrdersByStatus(status), HttpStatus.OK);
+    }
 
-    // TODO: 6 - Create a POST endpoint mapped to "/api/v1/orders"
-    //  that takes an Order @RequestBody and returns the saved order
+    @PostMapping
+    public ResponseEntity<Order> createOrder(@RequestBody Order order) {
+        return new ResponseEntity<>(orderService.createOrder(order), HttpStatus.CREATED);
+    }
 
-    // TODO: 7 - Create a PUT endpoint mapped to "/api/v1/orders/{id}"
-    //  that takes a @PathVariable Long id and @RequestBody Order
-    //  Set the id on the order and update it
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateOrder(@RequestBody Order order, @PathVariable Long id) {
+        orderService.updateOrder(order);
+        return ResponseEntity.noContent().build();
+    }
 
-    // TODO: 8 - Create a DELETE endpoint mapped to "/api/v1/orders/{id}"
-    //  that takes a @PathVariable Long id and deletes the order
-
-    // TODO: 10 - Refactor all endpoints to return ResponseEntity<> with proper status codes:
-    //  - GET returns 200 (OK)
-    //  - POST returns 201 (Created)
-    //  - PUT returns 204 (No Content)
-    //  - DELETE returns 204 or 404
-    //  Hint: look at CustomerController for reference
+    @DeleteMapping("{id}")
+    public ResponseEntity<Order> deleteOrder(@PathVariable Long id) {
+        if (orderService.deleteOrder(id)) {
+            return ResponseEntity.noContent().build();
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
 
 }
